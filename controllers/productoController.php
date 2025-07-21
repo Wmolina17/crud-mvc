@@ -28,10 +28,31 @@ class ProductoController
         }
     }
 
+    private function obtenerEstadisticas()
+    {
+        $productos = $this->productoModel->obtenerTodos();
+        $totalProductos = count($productos);
+        $productosActivos = array_filter($productos, fn($p) => $p['activo'] == 1);
+        $totalActivos = count($productosActivos);
+        $unaSemanaAtras = date('Y-m-d', strtotime('-7 days'));
+        $productosSemana = array_filter($productos, fn($p) => $p['created_at'] >= $unaSemanaAtras);
+        $totalSemana = count($productosSemana);
+
+        return [
+            'totalProductos' => $totalProductos,
+            'totalActivos' => $totalActivos,
+            'totalSemana' => $totalSemana
+        ];
+    }
+
     public function index()
     {
         $productos = $this->productoModel->obtenerTodos();
-        $this->cargarVista('productos/index', ['productos' => $productos]);
+
+        $this->cargarVista('productos/index', [
+            'productos' => $productos,
+            ...$this->obtenerEstadisticas()
+        ]);
     }
 
     public function create()
@@ -53,6 +74,7 @@ class ProductoController
         $nombre = $_POST['nombre'] ?? '';
         $precio = $_POST['precio'] ?? '';
         $descripcion = $_POST['descripcion'] ?? '';
+        $activo = 1;
 
         $errores = [];
         if (empty($nombre))
@@ -63,11 +85,12 @@ class ProductoController
             $errores[] = "La descripción es requerida";
 
         if (empty($errores)) {
-            if ($this->productoModel->crear($nombre, $precio, $descripcion)) {
+            if ($this->productoModel->crear($nombre, $precio, $descripcion, $activo)) {
                 header('Content-Type: application/json');
                 echo json_encode([
                     'success' => true,
-                    'message' => 'Producto creado exitosamente'
+                    'message' => 'Producto creado exitosamente',
+                    'estadisticas' => $this->obtenerEstadisticas()
                 ]);
                 return;
             } else {
@@ -80,7 +103,8 @@ class ProductoController
             'errores' => $errores,
             'nombre' => $nombre,
             'precio' => $precio,
-            'descripcion' => $descripcion
+            'descripcion' => $descripcion,
+            'activo' => $activo
         ]);
         $html = ob_get_clean();
 
@@ -126,7 +150,14 @@ class ProductoController
         }
 
         ob_start();
-        $this->cargarVista('productos/edit', ['producto' => $producto]);
+        $this->cargarVista('productos/edit', [
+            'id' => $producto['id'],
+            'nombre' => $producto['nombre'],
+            'precio' => $producto['precio'],
+            'descripcion' => $producto['descripcion'],
+            'activo' => $producto['activo']
+        ]);
+
         $html = ob_get_clean();
 
         header('Content-Type: application/json');
@@ -150,6 +181,7 @@ class ProductoController
         $nombre = $_POST['nombre'] ?? '';
         $precio = $_POST['precio'] ?? '';
         $descripcion = $_POST['descripcion'] ?? '';
+        $activo = isset($_POST['activo']) ? 1 : 0;
 
         $errores = [];
         if (empty($nombre))
@@ -160,11 +192,12 @@ class ProductoController
             $errores[] = "La descripción es requerida";
 
         if (empty($errores)) {
-            if ($this->productoModel->actualizar($id, $nombre, $precio, $descripcion)) {
+            if ($this->productoModel->actualizar($id, $nombre, $precio, $descripcion, $activo)) {
                 header('Content-Type: application/json');
                 echo json_encode([
                     'success' => true,
-                    'message' => 'Producto actualizado exitosamente'
+                    'message' => 'Producto actualizado exitosamente',
+                    'estadisticas' => $this->obtenerEstadisticas()
                 ]);
                 return;
             } else {
@@ -178,7 +211,8 @@ class ProductoController
             'errores' => $errores,
             'nombre' => $nombre,
             'precio' => $precio,
-            'descripcion' => $descripcion
+            'descripcion' => $descripcion,
+            'activo' => $activo
         ]);
         $html = ob_get_clean();
 
@@ -194,7 +228,8 @@ class ProductoController
             header('Content-Type: application/json');
             echo json_encode([
                 'success' => true,
-                'message' => 'Producto eliminado exitosamente'
+                'message' => 'Producto eliminado exitosamente',
+                'estadisticas' => $this->obtenerEstadisticas()
             ]);
         } else {
             header('Content-Type: application/json');

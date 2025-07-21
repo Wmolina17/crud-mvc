@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CRUD MVC - Productos</title>
-    <link rel="stylesheet" href="/crud-mvc/public/css/style.css">
+    <link rel="stylesheet" href="/crud-mvc/public/css/style.css?v=<?= time() ?>">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 </head>
 
@@ -18,24 +18,14 @@
         </div>
     </nav>
 
-    <div id="toast-container" class="toast-container"></div>
-
     <div class="main-container">
-        <?php if (isset($_GET['success'])): ?>
-            <div class="alert success">Producto creado exitosamente</div>
-        <?php elseif (isset($_GET['updated'])): ?>
-            <div class="alert success">Producto actualizado exitosamente</div>
-        <?php elseif (isset($_GET['deleted'])): ?>
-            <div class="alert success">Producto eliminado exitosamente</div>
-        <?php elseif (isset($_GET['error'])): ?>
-            <div class="alert error">Error en la operación</div>
-        <?php endif; ?>
-
         <?php echo $content ?? ''; ?>
     </div>
 
-    <script src="/crud-mvc/public/js/productos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="/crud-mvc/public/js/productos.js?v=<?= time() ?>"></script>
+    <script src="/crud-mvc/public/js/filtros.js?v=<?= time() ?>"></script>
 </body>
 
 </html>

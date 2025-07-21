@@ -6,10 +6,11 @@ CREATE TABLE IF NOT EXISTS productos (
     nombre VARCHAR(255) NOT NULL,
     precio DECIMAL(10, 2) NOT NULL,
     descripcion TEXT,
+    activo TINYINT(1) NOT NULL DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-INSERT INTO productos (nombre, precio, descripcion) VALUES
-('Laptop HP', 899.99, 'Laptop HP con procesador Intel i5'),
-('Mouse Logitech', 29.99, 'Mouse inalámbrico Logitech'),
-('Teclado Mecánico', 89.99, 'Teclado mecánico RGB');
+INSERT INTO productos (nombre, precio, descripcion, activo) VALUES
+('Laptop HP', 899.99, 'Laptop HP con procesador Intel i5', 1),
+('Mouse Logitech', 29.99, 'Mouse inalámbrico Logitech', 1),
+('Teclado Mecánico', 89.99, 'Teclado mecánico RGB', 1);

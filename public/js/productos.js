@@ -25,7 +25,6 @@ function cargarEnModal(url) {
         });
 }
 
-
 function verProducto(id) {
     cargarEnModal(`/crud-mvc/public/productos/${id}?modal=1`);
 }
@@ -35,21 +34,39 @@ function editarProducto(id) {
 }
 
 function eliminarProducto(id) {
-    if (confirm('¿Eliminar este producto?')) {
-        fetch(`/crud-mvc/public/productos/${id}/delete`, {
-            method: 'POST',
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-        })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    showToast(data.message);
-                    actualizarGridProductos();
-                } else {
-                    showToast(data.message, "error");
-                }
-            });
-    }
+    Swal.fire({
+        title: '¿Estás seguro?',
+        text: 'Este producto será eliminado permanentemente.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#aaa',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch(`/crud-mvc/public/productos/${id}/delete`, {
+                method: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast(data.message);
+
+                        if (data.estadisticas) {
+                            document.getElementById('total-productos').textContent = data.estadisticas.totalProductos;
+                            document.getElementById('total-activos').textContent = data.estadisticas.totalActivos;
+                            document.getElementById('total-semana').textContent = data.estadisticas.totalSemana;
+                        }
+
+                        actualizarGridProductos();
+                    } else {
+                        showToast(data.message, "error");
+                    }
+                });
+        }
+    });
 }
 
 function enviarFormulario(e) {
@@ -75,7 +92,14 @@ function enviarFormulario(e) {
         .then(data => {
             if (data.success) {
                 cerrarModal();
-                showToast(data.message);
+                showToast(data.message)
+
+                if (data.estadisticas) {
+                    document.getElementById('total-productos').textContent = data.estadisticas.totalProductos;
+                    document.getElementById('total-activos').textContent = data.estadisticas.totalActivos;
+                    document.getElementById('total-semana').textContent = data.estadisticas.totalSemana;
+                }
+                
                 actualizarGridProductos();
             } else {
                 document.getElementById('modal-body').innerHTML = data.html;
@@ -105,7 +129,6 @@ function actualizarGridProductos() {
             const gridActual = document.querySelector('.grid-productos');
             const mensajeActual = document.querySelector('.mensaje-info');
 
-            // Si hay productos nuevos
             if (nuevaGrid) {
                 if (gridActual) {
                     gridActual.innerHTML = nuevaGrid.innerHTML;
@@ -114,7 +137,6 @@ function actualizarGridProductos() {
                     if (mensajeActual) mensajeActual.remove();
                 }
             } else if (mensajeVacio) {
-                // Si ya no hay productos
                 if (gridActual) gridActual.remove();
                 if (!mensajeActual) {
                     document.querySelector('.cont-all-info').insertAdjacentElement('beforeend', mensajeVacio);
@@ -142,3 +164,42 @@ function showToast(message, type = "success") {
         stopOnFocus: true
     }).showToast();
 }
+
+const productosOriginales = [...document.querySelectorAll('.card-producto')];
+
+function filtrarProductos(tipo) {
+    const ahora = new Date();
+    const haceUnaSemana = new Date();
+    haceUnaSemana.setDate(ahora.getDate() - 7);
+
+    productosOriginales.forEach(card => {
+        const activo = card.dataset.activo === "1";
+        const fecha = new Date(card.dataset.fecha);
+        const nombre = card.dataset.nombre.toLowerCase();
+
+        let visible = true;
+
+        if (tipo === "activos") visible = activo;
+        else if (tipo === "inactivos") visible = !activo;
+        else if (tipo === "semana") visible = fecha >= haceUnaSemana;
+
+        card.style.display = visible ? "block" : "none";
+    });
+
+    document.querySelectorAll('.filtro-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelector(`.filtro-btn[data-filtro="${tipo}"]`).classList.add('active');
+}
+
+document.querySelectorAll('.filtro-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        filtrarProductos(btn.dataset.filtro);
+    });
+});
+
+document.getElementById('buscador-nombre').addEventListener('input', (e) => {
+    const texto = e.target.value.toLowerCase();
+    productosOriginales.forEach(card => {
+        const nombre = card.dataset.nombre.toLowerCase();
+        card.style.display = nombre.includes(texto) ? "block" : "none";
+    });
+});

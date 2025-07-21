@@ -3,6 +3,7 @@
     <p><strong>Nombre</strong> <?= htmlspecialchars($producto['nombre']) ?></p>
     <p><strong>Precio</strong> $<?= number_format($producto['precio'], 2) ?></p>
     <p><strong>Descripción</strong><?= nl2br(htmlspecialchars($producto['descripcion'])) ?></p>
+    <p><strong>Activo:</strong> <?= $producto['activo'] ? 'Sí' : 'No' ?></p>
 
     <hr>
     <div class="acciones-form">

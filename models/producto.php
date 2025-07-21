@@ -22,16 +22,16 @@ class Producto {
         return $stmt->fetch();
     }
     
-    public function crear($nombre, $precio, $descripcion) {
-        $query = "INSERT INTO productos (nombre, precio, descripcion) VALUES (?, ?, ?)";
+    public function crear($nombre, $precio, $descripcion, $activo) {
+        $query = "INSERT INTO productos (nombre, precio, descripcion, activo) VALUES (?, ?, ?, ?)";
         $stmt = $this->conn->prepare($query);
-        return $stmt->execute([$nombre, $precio, $descripcion]);
+        return $stmt->execute([$nombre, $precio, $descripcion, $activo]);
     }
     
-    public function actualizar($id, $nombre, $precio, $descripcion) {
-        $query = "UPDATE productos SET nombre = ?, precio = ?, descripcion = ? WHERE id = ?";
+    public function actualizar($id, $nombre, $precio, $descripcion, $activo) {
+        $query = "UPDATE productos SET nombre = ?, precio = ?, descripcion = ?, activo = ? WHERE id = ?";
         $stmt = $this->conn->prepare($query);
-        return $stmt->execute([$nombre, $precio, $descripcion, $id]);
+        return $stmt->execute([$nombre, $precio, $descripcion, $activo, $id]);
     }
     
     public function eliminar($id) {

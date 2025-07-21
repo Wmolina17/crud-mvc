@@ -41,7 +41,7 @@ if (!empty($segments[0]) && $segments[0] === 'productos') {
                 if ($method === 'POST') {
                     $controller->update($id);
                 } else {
-                    http_response_code(405); // Method Not Allowed
+                    http_response_code(405);
                 }
                 break;
             case 'delete':

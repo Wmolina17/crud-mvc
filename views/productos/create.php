@@ -11,18 +11,15 @@
         </div>
     <?php endif; ?>
 
-    <form method="POST" action="/crud-mvc/public/productos/<?= $producto['id'] ?>/create">
+    <form method="POST" action="/crud-mvc/public/productos">
         <label>Nombre</label>
-        <input type="text" name="nombre" placeholder="escriba aqui el nombre del producto"
-            value="<?= htmlspecialchars($nombre ?? '') ?>" required>
+        <input type="text" name="nombre" value="<?= htmlspecialchars($nombre ?? '') ?>" required>
 
         <label>Precio</label>
-        <input type="number" step="0.01" name="precio" placeholder="escriba aqui el precio del producto"
-            value="<?= htmlspecialchars($precio ?? '') ?>" required>
+        <input type="number" step="0.01" name="precio" value="<?= htmlspecialchars($precio ?? '') ?>" required>
 
         <label>Descripción</label>
-        <textarea name="descripcion" placeholder="escriba aqui la descripcion del producto"
-            required><?= htmlspecialchars($descripcion ?? '') ?></textarea>
+        <textarea name="descripcion" required><?= htmlspecialchars($descripcion ?? '') ?></textarea>
 
         <div class="acciones-form">
             <button type="submit" class="btn btn-verde">Guardar</button>
